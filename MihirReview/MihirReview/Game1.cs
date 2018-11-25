@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 
 namespace MihirReview
 {
@@ -16,6 +17,10 @@ namespace MihirReview
         Paddle leftpaddle;
         Paddle rightpaddle;
         KeyboardState ks;
+        int rightscore = 0;
+        int leftscore = 0;
+
+        SpriteFont font;
 
         //Texture2D pixel1;
         //Texture2D pixel2;
@@ -48,9 +53,11 @@ namespace MihirReview
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            ball = new Ball(Content.Load<Texture2D>("pong"), new Vector2(50, 50), new Vector2(12,12));
+            ball = new Ball(Content.Load<Texture2D>("pong"), new Vector2(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2), new Vector2(2,2));
             leftpaddle = new Paddle(Content.Load<Texture2D>("GreenPaddle"), new Vector2(0, 100), new Vector2(0, 5));
             rightpaddle = new Paddle(Content.Load<Texture2D>("RedPaddle"), new Vector2(GraphicsDevice.Viewport.Width - 18, 100), new Vector2(0, 5));
+
+            font = Content.Load<SpriteFont>("font1");
 
             //pixel1 = new Texture2D(GraphicsDevice, 1, 1);
             //pixel1.SetData(new Color[] { Color.White });
@@ -76,6 +83,16 @@ namespace MihirReview
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+
+            if(ball.ballhitbox.Intersects(rightpaddle.paddlehitbox))
+            {
+                ball.Speed = new Vector2(-Math.Abs(ball.Speed.X), ball.Speed.Y);
+            }
+
+            if (ball.ballhitbox.Intersects(leftpaddle.paddlehitbox))
+            {
+                ball.Speed = new Vector2(Math.Abs(ball.Speed.X), ball.Speed.Y);
+            }
             ks = Keyboard.GetState();
 
             if (ks.IsKeyDown(Keys.Up))
@@ -99,6 +116,17 @@ namespace MihirReview
             }
 
             ball.Move(GraphicsDevice.Viewport.Bounds);
+
+            if (ball.HitLeft)
+            {
+                rightscore++;
+            }
+
+            if (ball.HitRight)
+            {
+                leftscore++;
+            }
+
             base.Update(gameTime);
         }
 
@@ -115,6 +143,8 @@ namespace MihirReview
             ball.Draw(spriteBatch);
             leftpaddle.Draw(spriteBatch);
             rightpaddle.Draw(spriteBatch);
+
+            spriteBatch.DrawString(font, rightscore.ToString(), new Vector2(0, 0), Color.White);
             //spriteBatch.Draw(pixel1, ball.ballhitbox, Color.Red);
             //spriteBatch.Draw(pixel2, leftpaddle.paddlehitbox, Color.Red);
             spriteBatch.End();

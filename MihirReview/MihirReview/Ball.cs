@@ -15,22 +15,33 @@ namespace MihirReview
         public Vector2 Speed;
         public Rectangle ballhitbox;
 
+        public bool HitLeft;
+        public bool HitRight;
+
+        private Vector2 originalPos;
+
         public Ball(Texture2D tex, Vector2 pos, Vector2 speed) : base(tex, pos)
         {
             Speed = speed;
+            originalPos = pos;
         }
 
         public void Move(Rectangle screenSize)
         {
+            HitLeft = false;
+            HitRight = false;
+
             Console.WriteLine(screenSize);
             if (this.Position.X < screenSize.Left)
             {
-                Speed = new Vector2(Math.Abs(Speed.X), Speed.Y);
+                Position = originalPos;
+                HitLeft = true;
             }
             
             if(this.Position.X + this.Texture.Width > screenSize.Right)
             {
-                Speed = new Vector2(-Math.Abs(Speed.X), Speed.Y);
+                Position = originalPos;
+                HitRight = true;
             }
 
             if (this.Position.Y < screenSize.Top)
