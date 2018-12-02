@@ -19,7 +19,8 @@ namespace MihirReview
         KeyboardState ks;
         int rightscore = 0;
         int leftscore = 0;
-
+        bool right = true;
+        bool left = true;
         SpriteFont font;
 
         //Texture2D pixel1;
@@ -53,7 +54,7 @@ namespace MihirReview
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            ball = new Ball(Content.Load<Texture2D>("pong"), new Vector2(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2), new Vector2(2,2));
+            ball = new Ball(Content.Load<Texture2D>("pong"), new Vector2(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2), new Vector2(7,7));
             leftpaddle = new Paddle(Content.Load<Texture2D>("GreenPaddle"), new Vector2(0, 100), new Vector2(0, 5));
             rightpaddle = new Paddle(Content.Load<Texture2D>("RedPaddle"), new Vector2(GraphicsDevice.Viewport.Width - 18, 100), new Vector2(0, 5));
 
@@ -83,49 +84,71 @@ namespace MihirReview
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-
-            if(ball.ballhitbox.Intersects(rightpaddle.paddlehitbox))
-            {
-                ball.Speed = new Vector2(-Math.Abs(ball.Speed.X), ball.Speed.Y);
-            }
-
-            if (ball.ballhitbox.Intersects(leftpaddle.paddlehitbox))
-            {
-                ball.Speed = new Vector2(Math.Abs(ball.Speed.X), ball.Speed.Y);
-            }
             ks = Keyboard.GetState();
 
-            if (ks.IsKeyDown(Keys.Up))
+            if (right == true && left == true)
             {
-                rightpaddle.moveup(GraphicsDevice.Viewport.Bounds);
+                if (ball.ballhitbox.Intersects(rightpaddle.paddlehitbox))
+                {
+                    ball.Speed = new Vector2(-Math.Abs(ball.Speed.X), ball.Speed.Y);
+                }
+
+                if (ball.ballhitbox.Intersects(leftpaddle.paddlehitbox))
+                {
+                    ball.Speed = new Vector2(Math.Abs(ball.Speed.X), ball.Speed.Y);
+                }
+           
+                if (ks.IsKeyDown(Keys.Up))
+                {
+                    rightpaddle.moveup(GraphicsDevice.Viewport.Bounds);
+                }
+
+                if (ks.IsKeyDown(Keys.Down))
+                {
+                    rightpaddle.movedown(GraphicsDevice.Viewport.Bounds);
+                }
+
+                if (ks.IsKeyDown(Keys.W))
+                {
+                    leftpaddle.moveup(GraphicsDevice.Viewport.Bounds);
+                }
+
+                if (ks.IsKeyDown(Keys.S))
+                {
+                    leftpaddle.movedown(GraphicsDevice.Viewport.Bounds);
+                }
+
+                ball.Move(GraphicsDevice.Viewport.Bounds);
+
+                if (ball.HitLeft)
+                {
+                    rightscore++;
+                }
+
+                if (ball.HitRight)
+                {
+                    leftscore++;
+                }
+
+                if (leftscore >= 10)
+                {
+                    right = false;
+                    leftscore = 0;
+                }
+
+                if (rightscore >= 10)
+                {
+                    left = false;
+                    rightscore = 0;
+                }
+            }
+            else
+            {
+                //check if the r key is pressed
+                //and restart
+
             }
 
-            if(ks.IsKeyDown(Keys.Down))
-            {
-                rightpaddle.movedown(GraphicsDevice.Viewport.Bounds);
-            }
-
-            if (ks.IsKeyDown(Keys.W))
-            {
-                leftpaddle.moveup(GraphicsDevice.Viewport.Bounds);
-            }
-
-            if (ks.IsKeyDown(Keys.S))
-            {
-                leftpaddle.movedown(GraphicsDevice.Viewport.Bounds);
-            }
-
-            ball.Move(GraphicsDevice.Viewport.Bounds);
-
-            if (ball.HitLeft)
-            {
-                rightscore++;
-            }
-
-            if (ball.HitRight)
-            {
-                leftscore++;
-            }
 
             base.Update(gameTime);
         }
@@ -143,8 +166,19 @@ namespace MihirReview
             ball.Draw(spriteBatch);
             leftpaddle.Draw(spriteBatch);
             rightpaddle.Draw(spriteBatch);
+            spriteBatch.DrawString(font, rightscore.ToString(), new Vector2(GraphicsDevice.Viewport.Width / 2 + 20, 0), Color.White);
+            spriteBatch.DrawString(font, leftscore.ToString(), new Vector2(GraphicsDevice.Viewport.Width / 2 - 20, 0), Color.White);
+            if(left == false)
+            {
+                spriteBatch.DrawString(font, $"Right Side Wins", new Vector2(GraphicsDevice.Viewport.Width - 250, 0 ), Color.Red);
+                spriteBatch.DrawString(font, $"Press R to Reset", new Vector2(300, 200), Color.Green);
+            }
+            if (right == false)
+            {
+                spriteBatch.DrawString(font, $"Left Side Wins", new Vector2(0, 0), Color.Red);
+                spriteBatch.DrawString(font, $"Press R to Reset", new Vector2(300, 200), Color.Green);
 
-            spriteBatch.DrawString(font, rightscore.ToString(), new Vector2(0, 0), Color.White);
+            }
             //spriteBatch.Draw(pixel1, ball.ballhitbox, Color.Red);
             //spriteBatch.Draw(pixel2, leftpaddle.paddlehitbox, Color.Red);
             spriteBatch.End();
