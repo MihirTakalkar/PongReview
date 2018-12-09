@@ -146,7 +146,14 @@ namespace MihirReview
             {
                 //check if the r key is pressed
                 //and restart
-
+                if(ks.IsKeyDown(Keys.R))
+                {
+                    rightscore = 0;
+                    leftscore = 0;
+                    left = true;
+                    right = true;
+                    ball.Position = new Vector2(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
+                }
             }
 
 
